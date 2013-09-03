@@ -1,7 +1,8 @@
 var foo;
 
 
-if (Ember.FEATURES.isEnabled("good-to-go")) {
-  console.log("Beta channel, whoo!");
-}
 
+  console.log("Beta channel, whoo!");
+  var bar;
+  // comments?
+  console.log("testing multi-lines");

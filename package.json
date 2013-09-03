@@ -1,0 +1,14 @@
+{
+  "name": "features",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodeunit tests"
+  },
+  "author": "",
+  "license": "BSD",
+  "dependencies": {
+    "esprima": "~1.0.4"
+  }
+}

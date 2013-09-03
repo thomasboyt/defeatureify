@@ -3,17 +3,16 @@ var esprima = require('esprima');
 
 var featureify = function(source, enabled) {
   enabled = enabled || {};
-  var sourceModifier = new SourceModifier(source);
 
   var tree = esprima.parse(source, {
     range: true
   });
 
-  var ranges;
+  var sourceModifier = new SourceModifier(source);
   var walk = function(node) {
     if (node.type === "IfStatement") {
       if (node.test.type === "CallExpression" && node.test.callee) {
-        // test object.FEATURES.property
+        // test object.property.property
         if (node.test.callee.object &&
             node.test.callee.object.object &&
             node.test.callee.object.property) {

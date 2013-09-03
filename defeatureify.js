@@ -8,7 +8,8 @@ var defeatureify = function(source, config) {
   var namespace = config.namespace || "Ember";
 
   var tree = esprima.parse(source, {
-    range: true
+    range: true,
+    loc: true
   });
 
   var sourceModifier = new SourceModifier(source);
@@ -28,10 +29,13 @@ var defeatureify = function(source, config) {
               // remove if (x) {
               sourceModifier.replace(node.range[0],
                                      node.consequent.range[0], "");
+
               // TODO: reindent
+
               // remove closing brace }
-              var lastStatement = node.consequent.body.length - 1;
-              sourceModifier.replace(node.consequent.body[lastStatement].range[1],
+              var body = node.consequent.body;
+              var lastStatement = body[body.length - 1];
+              sourceModifier.replace(lastStatement.range[1],
                                      node.range[1], "");
             } else {
               sourceModifier.replace(node.range[0], node.range[1], "");
@@ -40,8 +44,13 @@ var defeatureify = function(source, config) {
         }
       }
     }
+
     if (node.body && node.body.length > 0) {
       node.body.forEach(walk);
+    } else if (node.type === "ExpressionStatement" &&
+               node.expression.callee && 
+               node.expression.callee.type === "FunctionExpression") {
+      node.expression.callee.body.body.forEach(walk);
     }
   };
   walk(tree);

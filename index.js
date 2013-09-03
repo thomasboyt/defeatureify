@@ -1,8 +1,11 @@
 var SourceModifier = require("./lib/source_modifier");
 var esprima = require('esprima');
 
-var featureify = function(source, enabled) {
-  enabled = enabled || {};
+var featureify = function(source, config) {
+  config = config || {};
+  enabled = config.enabled || {};
+
+  var namespace = config.namespace || "Ember";
 
   var tree = esprima.parse(source, {
     range: true
@@ -16,8 +19,8 @@ var featureify = function(source, enabled) {
         if (node.test.callee.object &&
             node.test.callee.object.object &&
             node.test.callee.object.property) {
-          // test Ember.FEATURES.isEnabled()
-          if (node.test.callee.object.object.name === "Ember" &&
+          // test namespace.FEATURES.isEnabled()
+          if (node.test.callee.object.object.name === namespace &&
               node.test.callee.object.property.name === "FEATURES" &&
               node.test.callee.property.name === "isEnabled") {
             var featureName = node.test.arguments[0].value;

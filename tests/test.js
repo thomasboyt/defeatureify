@@ -20,3 +20,20 @@ exports.testIIFE = function(test) {
   test.equal(res, expected, "IIFEs are parsed");
   test.done();
 };
+
+exports.testElse = function(test) {
+  var source = fs.readFileSync(__dirname + "/fixture/else.in.js").toString();
+
+  var expectedDisabled = fs.readFileSync(__dirname + "/fixture/else.out.disabled.js").toString();
+  var resDisabled = defeatureify(source);
+
+  var expectedEnabled = fs.readFileSync(__dirname + "/fixture/else.out.enabled.js").toString();
+  var resEnabled = defeatureify(source, {
+    enabled: {"else-testing": true}
+  });
+
+  test.expect(2);
+  test.equal(resDisabled, expectedDisabled, "Else statements are kept in when the feature is disabled");
+  test.equal(resEnabled, expectedEnabled, "Else statements are removed when the feature is enabled");
+  test.done();
+};

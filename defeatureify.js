@@ -24,7 +24,9 @@ var defeatureify = function(source, config) {
           if (node.test.callee.object.object.name === namespace &&
               node.test.callee.object.property.name === "FEATURES" &&
               node.test.callee.property.name === "isEnabled") {
+
             var featureName = node.test.arguments[0].value;
+
             if (enabled[featureName]) {
               // remove if (x) {
               sourceModifier.replace(node.range[0],
@@ -35,11 +37,32 @@ var defeatureify = function(source, config) {
               // remove closing brace }
               var body = node.consequent.body;
               var lastStatement = body[body.length - 1];
-              sourceModifier.replace(lastStatement.range[1],
-                                     node.range[1], "");
+              sourceModifier.replace(node.consequent.range[1] - 1,
+                                     node.consequent.range[1] - 1, "");
+
+              // remove else clause if exists
+              if (node.alternate && node.alternate.type === "BlockStatement") {
+                sourceModifier.replace(node.consequent.range[1], node.alternate.range[1], "");
+              }
             } else {
-              sourceModifier.replace(node.range[0], node.range[1], "");
+              // remove if, leave else
+              if (!node.alternate) {
+                sourceModifier.replace(node.range[0], node.range[1], "");
+              } else {
+                sourceModifier.replace(node.range[0], node.alternate.range[0], "");
+                sourceModifier.replace(node.alternate.range[1]-1, node.alternate.range[1]-1, "");
+              }
             }
+
+            // else
+            /*if (node.alternate &&
+                node.alternate.type === "BlockStatement") {
+              if (enabled[featureName] {
+                sourceModifier.replace(node.alternate.range[0], node.alternate.range[1], "");
+              } else {
+              }
+            }*/
+
           }
         }
       }
@@ -48,7 +71,7 @@ var defeatureify = function(source, config) {
     if (node.body && node.body.length > 0) {
       node.body.forEach(walk);
     } else if (node.type === "ExpressionStatement" &&
-               node.expression.callee && 
+               node.expression.callee &&
                node.expression.callee.type === "FunctionExpression") {
       node.expression.callee.body.body.forEach(walk);
     }

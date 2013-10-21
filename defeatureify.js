@@ -17,7 +17,7 @@ var defeatureify = function(source, config) {
   // naively searches for "body" keys in nodes to recurse through
   var findBody = function(node) {
     for (var key in node) {
-      if (key === 'body') {
+      if (key === 'body' && Array.isArray(node[key])) {
         node[key].forEach(walk);
       } else if (typeof node[key] === 'object' && node !== null) {
         findBody(node[key]);

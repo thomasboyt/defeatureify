@@ -37,3 +37,8 @@ exports.testElse = function(test) {
   test.equal(resEnabled, expectedEnabled, "Else statements are removed when the feature is enabled");
   test.done();
 };
+
+exports.testNestedIf = function(test) {
+  // TODO
+  test.done();
+};

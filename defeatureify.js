@@ -53,16 +53,6 @@ var defeatureify = function(source, config) {
                 sourceModifier.replace(node.alternate.range[1]-1, node.alternate.range[1]-1, "");
               }
             }
-
-            // else
-            /*if (node.alternate &&
-                node.alternate.type === "BlockStatement") {
-              if (enabled[featureName] {
-                sourceModifier.replace(node.alternate.range[0], node.alternate.range[1], "");
-              } else {
-              }
-            }*/
-
           }
         }
       }
@@ -70,6 +60,8 @@ var defeatureify = function(source, config) {
 
     if (node.body && node.body.length > 0) {
       node.body.forEach(walk);
+    } else if (node.consequent && node.consequent.body && node.consequent.body.length > 0) {
+      node.consequent.body.forEach(walk);
     } else if (node.type === "ExpressionStatement" &&
                node.expression.callee &&
                node.expression.callee.type === "FunctionExpression") {

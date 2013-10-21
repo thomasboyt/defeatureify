@@ -42,3 +42,8 @@ exports.testNestedIf = function(test) {
   // TODO
   test.done();
 };
+
+exports.testFunctionDefinition = function(test) {
+  // TODO
+  test.done();
+};

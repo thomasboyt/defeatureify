@@ -13,6 +13,18 @@ var defeatureify = function(source, config) {
   });
 
   var sourceModifier = new SourceModifier(source);
+
+  // naively searches for "body" keys in nodes to recurse through
+  var findBody = function(node) {
+    for (var key in node) {
+      if (key === 'body') {
+        node[key].forEach(walk);
+      } else if (typeof node[key] === 'object' && node !== null) {
+        findBody(node[key]);
+      }
+    }
+  };
+
   var walk = function(node) {
     if (node.type === "IfStatement") {
       if (node.test.type === "CallExpression" && node.test.callee) {
@@ -58,15 +70,7 @@ var defeatureify = function(source, config) {
       }
     }
 
-    if (node.body && node.body.length > 0) {
-      node.body.forEach(walk);
-    } else if (node.consequent && node.consequent.body && node.consequent.body.length > 0) {
-      node.consequent.body.forEach(walk);
-    } else if (node.type === "ExpressionStatement" &&
-               node.expression.callee &&
-               node.expression.callee.type === "FunctionExpression") {
-      node.expression.callee.body.body.forEach(walk);
-    }
+    findBody(node);
   };
   walk(tree);
 

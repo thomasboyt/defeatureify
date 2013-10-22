@@ -8,3 +8,10 @@ var foo;
   console.log("testing multi-lines");
 
 
+if (Ember.FEATURES.isEnabled("ambivalent")) {
+  console.log("Meh, who cares");
+  var biff;
+  // comments?
+  console.log("testing multi-lines");
+}
+

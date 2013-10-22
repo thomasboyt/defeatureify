@@ -39,7 +39,7 @@ var defeatureify = function(source, config) {
 
             var featureName = node.test.arguments[0].value;
 
-            if (enabled[featureName]) {
+            if (enabled[featureName] === true) {
               // remove if (x) {
               sourceModifier.replace(node.range[0],
                                      node.consequent.range[0], "");
@@ -56,7 +56,7 @@ var defeatureify = function(source, config) {
               if (node.alternate && node.alternate.type === "BlockStatement") {
                 sourceModifier.replace(node.consequent.range[1], node.alternate.range[1], "");
               }
-            } else {
+            } else if (enabled[featureName] === false || enabled[featureName] === undefined) {
               // remove if, leave else
               if (!node.alternate) {
                 sourceModifier.replace(node.range[0], node.range[1], "");

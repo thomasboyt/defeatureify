@@ -5,10 +5,10 @@ exports.testFixture = function(test){
   var source = fs.readFileSync(__dirname + "/fixture/example.in.js").toString();
   var expected = fs.readFileSync(__dirname + "/fixture/example.out.js").toString();
   var res = defeatureify(source, {
-    enabled: {"good-to-go": true}
+    enabled: {"good-to-go": true, "ambivalent": null}
   });
   test.expect(1);
-  test.equal(res, expected, "Non-whitelisted feature was removed, whitelisted feature had conditional removed");
+  test.equal(res, expected, "Non-whitelisted feature was removed, whitelisted feature had conditional removed, and null feature was left flagged");
   test.done();
 };
 
@@ -32,9 +32,14 @@ exports.testElse = function(test) {
     enabled: {"else-testing": true}
   });
 
-  test.expect(2);
+  var resNull = defeatureify(source, {
+    enabled: {"else-testing": null}
+  });
+
+  test.expect(3);
   test.equal(resDisabled, expectedDisabled, "Else statements are kept in when the feature is disabled");
   test.equal(resEnabled, expectedEnabled, "Else statements are removed when the feature is enabled");
+  test.equal(resNull, source, "The raw input is output when a flag value is null");
   test.done();
 };
 

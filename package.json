@@ -5,12 +5,15 @@
   "main": "defeatureify.js",
   "bin": "./bin/cli.js",
   "scripts": {
-    "test": "nodeunit tests"
+    "test": "node_modules/.bin/nodeunit tests"
   },
   "author": "Thomas Boyt <me@thomasboyt.com>",
   "license": "MIT",
   "dependencies": {
     "esprima": "~1.0.4",
     "optimist": "~0.6.0"
+  },
+  "devDependencies": {
+    "nodeunit": "~0.8.2"
   }
 }

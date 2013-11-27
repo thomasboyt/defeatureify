@@ -14,6 +14,14 @@ var defeatureify = function(source, config) {
 
   var sourceModifier = new SourceModifier(source);
 
+  var debugStatements = ["Ember.warn", "Ember.assert", "Ember.deprecate", "Ember.debug", "Ember.Logger.info"];
+
+  var getCalleeExpression = function(node) {
+    if (node.type === 'MemberExpression') { return getCalleeExpression(node.object) + '.' + node.property.name; }
+    else if (node.type === 'Identifier') { return node.name; }
+    else { return null; }
+  };
+
   // naively searches for "body" keys in nodes to recurse through
   var findBody = function(node) {
     for (var key in node) {
@@ -66,6 +74,15 @@ var defeatureify = function(source, config) {
               }
             }
           }
+        }
+      }
+    }
+
+    if (config.stripdebug && node.type === "ExpressionStatement" && node.expression) {
+      if (node.expression.type === "CallExpression") {
+        var calleeExpression = getCalleeExpression(node.expression.callee);
+        if (debugStatements.indexOf(calleeExpression) != -1) {
+          sourceModifier.replace(node.range[0], node.range[1], "");
         }
       }
     }

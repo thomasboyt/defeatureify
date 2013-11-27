@@ -4,6 +4,8 @@ var argv = require('optimist')
             .boolean('v')
             .alias('v','version')
             .alias('w', 'whitelist')
+            .boolean('s')
+            .alias('s', 'stripdebug')
             .argv;
 
 var fs = require('fs');
@@ -28,7 +30,8 @@ if (argv.version) {
 
   var config = {
     enabled: whitelist,
-    namespace: argv.n
+    namespace: argv.n,
+    stripdebug: argv.stripdebug
   };
 
   var defeatureify = require(__dirname + "/../defeatureify.js");

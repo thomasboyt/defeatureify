@@ -52,3 +52,14 @@ exports.testFunctionDefinition = function(test) {
   // TODO
   test.done();
 };
+
+exports.testStripDebugStatements = function(test) {
+  var source = fs.readFileSync(__dirname + "/fixture/strip_debug.in.js").toString();
+  var expected = fs.readFileSync(__dirname + "/fixture/strip_debug.out.js").toString();
+  var res = defeatureify(source, {
+    stripdebug: true
+  });
+  test.expect(1);
+  test.equal(res, expected, "Ember debug messages are stripped");
+  test.done();
+}

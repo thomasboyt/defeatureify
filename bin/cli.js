@@ -3,7 +3,7 @@
 var argv = require('optimist')
             .boolean('v')
             .alias('v','version')
-            .alias('w', 'whitelist')
+            .alias('c', 'config')
             .boolean('s')
             .alias('s', 'stripdebug')
             .argv;
@@ -21,17 +21,20 @@ if (argv.version) {
   }
 
   var source = fs.readFileSync(filename).toString();
-  var whitelist;
-  if (argv.w) {
-    whitelist = JSON.parse(fs.readFileSync(argv.w).toString());
+  var configJson;
+  if (argv.c) {
+    configJson = JSON.parse(fs.readFileSync(argv.c).toString());
   } else {
-    whitelist = {};
+    configJson = {};
   }
 
+  if (!configJson.features) configJson.features = {};
+
   var config = {
-    enabled: whitelist,
-    namespace: argv.n,
-    stripdebug: argv.stripdebug
+    enabled: configJson.features,
+    debugStatements: configJson.debugStatements,
+    namespace: argv.n || configJson.namespace,
+    enableStripDebug: argv.stripdebug || configJson.enableStripDebug
   };
 
   var defeatureify = require(__dirname + "/../defeatureify.js");

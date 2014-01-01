@@ -6,6 +6,7 @@ var defeatureify = function(source, config) {
   enabled = config.enabled || {};
 
   var namespace = config.namespace || "Ember";
+  var debugStatements = config.debugStatements;
 
   var tree = esprima.parse(source, {
     range: true,
@@ -13,8 +14,6 @@ var defeatureify = function(source, config) {
   });
 
   var sourceModifier = new SourceModifier(source);
-
-  var debugStatements = ["Ember.warn", "Ember.assert", "Ember.deprecate", "Ember.debug", "Ember.Logger.info"];
 
   var getCalleeExpression = function(node) {
     if (node.type === 'MemberExpression') { return getCalleeExpression(node.object) + '.' + node.property.name; }
@@ -78,7 +77,7 @@ var defeatureify = function(source, config) {
       }
     }
 
-    if (config.stripdebug && node.type === "ExpressionStatement" && node.expression) {
+    if (config.enableStripDebug && node.type === "ExpressionStatement" && node.expression) {
       if (node.expression.type === "CallExpression") {
         var calleeExpression = getCalleeExpression(node.expression.callee);
         if (debugStatements.indexOf(calleeExpression) != -1) {

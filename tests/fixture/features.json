@@ -1,4 +1,6 @@
 {
-  "good-to-go": true,
-  "else-testing": true
+  "features": {
+    "good-to-go": true,
+    "else-testing": true
+  }
 }

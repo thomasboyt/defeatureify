@@ -18,7 +18,10 @@
 ```
 
 * `-w`/`--whitelist` option is now `-c`/`--config`
-* Support stripping out debug statements:
+* Support stripping out debug statements (list specified in the config file with option `debugStatements`).
+  Can be enabled via either a config file option (`enableStripDebug`) or command line option (`--stripdebug`).
+
+  Example of enabling the stripping of debug statements in Ember:
 
 ```js
 //features.json

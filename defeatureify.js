@@ -32,50 +32,84 @@ var defeatureify = function(source, config) {
     }
   };
 
-  var walk = function(node) {
-    if (node.type === "IfStatement") {
-      if (node.test.type === "CallExpression" && node.test.callee) {
-        // test object.property.property
-        if (node.test.callee.object &&
-            node.test.callee.object.object &&
-            node.test.callee.object.property) {
-          // test namespace.FEATURES.isEnabled()
-          if (node.test.callee.object.object.name === namespace &&
-              node.test.callee.object.property.name === "FEATURES" &&
-              node.test.callee.property.name === "isEnabled") {
+  var isValidIfNode = function(node) {
+    return node.type === "IfStatement" &&
+    node.test.type === "CallExpression" &&
+    node.test.callee;
+  };
 
-            var featureName = node.test.arguments[0].value;
+  var isValidNotIfNode = function(node) {
+    return node.type === "IfStatement" &&
+    node.test.type === "UnaryExpression" &&
+    node.test.argument.type == "CallExpression" &&
+    node.test.argument.callee;
+  };
 
-            if (enabled[featureName] === true) {
-              // remove if (x) {
-              sourceModifier.replace(node.range[0],
-                                     node.consequent.range[0], "");
+  var isEnabled = function(featureName, inverse) {
+    if (inverse) {
+      return enabled[featureName] === false || enabled[featureName] === undefined;
+    } else {
+      return enabled[featureName] === true;
+    }
+  };
 
-              // TODO: reindent
+  var isDisabled = function(featureName, inverse) {
+    if (inverse) {
+      return enabled[featureName] === true;
+    } else {
+      return enabled[featureName] === false || enabled[featureName] === undefined;
+    }
+  };
 
-              // remove closing brace }
-              var body = node.consequent.body;
-              var lastStatement = body[body.length - 1];
-              sourceModifier.replace(node.consequent.range[1] - 1,
-                                     node.consequent.range[1] - 1, "");
+  var walkIfTree = function(node, testNode, inverse) {
 
-              // remove else clause if exists
-              if (node.alternate && node.alternate.type === "BlockStatement") {
-                sourceModifier.replace(node.consequent.range[1], node.alternate.range[1], "");
-              }
-            } else if (enabled[featureName] === false || enabled[featureName] === undefined) {
-              // remove if, leave else
-              if (!node.alternate) {
-                sourceModifier.replace(node.range[0], node.range[1], "");
-              } else {
-                sourceModifier.replace(node.range[0], node.alternate.range[0], "");
-                sourceModifier.replace(node.alternate.range[1]-1, node.alternate.range[1]-1, "");
-              }
-            }
+    // test object.property.property
+    if (testNode.callee.object &&
+        testNode.callee.object.object &&
+        testNode.callee.object.property) {
+      // test namespace.FEATURES.isEnabled()
+      if (testNode.callee.object.object.name === namespace &&
+          testNode.callee.object.property.name === "FEATURES" &&
+          testNode.callee.property.name === "isEnabled") {
+        var featureName = testNode.arguments[0].value;
+
+        if (isEnabled(featureName, inverse)) {
+          // remove if (x) {
+          sourceModifier.replace(node.range[0],
+                                 node.consequent.range[0], "");
+
+          // TODO: reindent
+
+          // remove closing brace }
+          var body = node.consequent.body;
+          var lastStatement = body[body.length - 1];
+          sourceModifier.replace(node.consequent.range[1] - 1,
+                                 node.consequent.range[1] - 1, "");
+
+          // remove else clause if exists
+          if (node.alternate && node.alternate.type === "BlockStatement") {
+            sourceModifier.replace(node.consequent.range[1], node.alternate.range[1], "");
+          }
+        } else if (isDisabled(featureName, inverse)) {
+          // remove if, leave else
+          if (!node.alternate) {
+            sourceModifier.replace(node.range[0], node.range[1], "");
+          } else {
+            sourceModifier.replace(node.range[0], node.alternate.range[0], "");
+            sourceModifier.replace(node.alternate.range[1]-1, node.alternate.range[1]-1, "");
           }
         }
       }
     }
+  };
+
+  var walk = function(node) {
+    if (isValidIfNode(node)) {
+      walkIfTree(node, node.test);
+    } else if (isValidNotIfNode(node)) {
+      walkIfTree(node, node.test.argument, true);
+    }
+
 
     if (config.enableStripDebug && node.type === "ExpressionStatement" && node.expression) {
       if (node.expression.type === "CallExpression") {

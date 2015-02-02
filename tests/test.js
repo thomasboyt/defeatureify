@@ -64,3 +64,14 @@ exports.testStripDebugStatements = function(test) {
   test.equal(res, expected, "Ember debug messages are stripped");
   test.done();
 };
+
+exports.testNamespaceDefault = function(test){
+  var source = fs.readFileSync(__dirname + "/fixture/namespace.default.in.js").toString();
+  var expected = fs.readFileSync(__dirname + "/fixture/namespace.default.out.js").toString();
+  var res = defeatureify(source, {
+    enabled: {"good-to-go": true, "ambivalent": null}
+  });
+  test.expect(1);
+  test.equal(res, expected, "Non-whitelisted feature was removed, whitelisted feature had conditional removed, and null feature was left flagged");
+  test.done();
+};

@@ -48,6 +48,28 @@ exports.testNestedIf = function(test) {
   test.done();
 };
 
+exports.testNot = function(test) {
+  var source = fs.readFileSync(__dirname + "/fixture/not.in.js").toString();
+
+  var expectedDisabled = fs.readFileSync(__dirname + "/fixture/not.out.disabled.js").toString();
+  var resDisabled = defeatureify(source);
+
+  var expectedEnabled = fs.readFileSync(__dirname + "/fixture/not.out.enabled.js").toString();
+  var resEnabled = defeatureify(source, {
+    enabled: {"not-testing": true}
+  });
+
+  var resNull = defeatureify(source, {
+    enabled: {"not-testing": null}
+  });
+
+  test.expect(3);
+  test.equal(resDisabled, expectedDisabled, "Else statements are kept in when the feature is disabled");
+  test.equal(resEnabled, expectedEnabled, "Else statements are removed when the feature is enabled");
+  test.equal(resNull, source, "The raw input is output when a flag value is null");
+  test.done();
+};
+
 exports.testFunctionDefinition = function(test) {
   // TODO
   test.done();

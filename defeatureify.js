@@ -16,7 +16,9 @@ var defeatureify = function(source, config) {
   var sourceModifier = new SourceModifier(source);
 
   var getCalleeExpression = function(node) {
-    if (node.type === 'MemberExpression') { return getCalleeExpression(node.object) + '.' + node.property.name; }
+    if (node.type === 'MemberExpression') {
+      return getCalleeExpression(node.object) + '.' + (node.property.name || node.property.value);
+    }
     else if (node.type === 'Identifier') { return node.name; }
     else { return null; }
   };

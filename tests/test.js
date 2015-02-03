@@ -58,7 +58,7 @@ exports.testStripDebugStatements = function(test) {
   var expected = fs.readFileSync(__dirname + "/fixture/strip_debug.out.js").toString();
   var res = defeatureify(source, {
     "enableStripDebug": true,
-    "debugStatements": ["Ember.warn", "Ember.assert", "Ember.deprecate", "Ember.debug", "Ember.Logger.info"]
+    "debugStatements": ["Ember.warn", "Ember.assert", "Ember.deprecate", "Ember.debug", "Ember.Logger.info", "Ember.default.debug"]
   });
   test.expect(1);
   test.equal(res, expected, "Ember debug messages are stripped");

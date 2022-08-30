@@ -7,6 +7,10 @@
   "scripts": {
     "test": "node_modules/.bin/nodeunit tests"
   },
+  "repository": {	
+    "type": "git",
+    "url": "https://github.com/thomasboyt/defeatureify.git"
+  },
   "author": "Thomas Boyt <me@thomasboyt.com>",
   "license": "MIT",
   "dependencies": {
